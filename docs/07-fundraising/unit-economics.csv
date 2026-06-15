@@ -1,0 +1,26 @@
+"# unit-economics.csv — CAC, payback, LTV, contribution margin/run, blended take, GMV retention."
+# CAC = marketing programs (excl payroll) / net-new active accounts. LTV = ARPU x GM / annual churn. USD. Estimates.
+
+=== SCENARIO: CONSERVATIVE ===
+year,calendar,cac_buyer,cac_builder,payback_months,ltv_buyer,ltv_builder,ltv_cac_buyer_ratio,contribution_margin_per_run,rev_per_run,cogs_per_run,blended_take_pct,take_rate_only_pct,arpu_buyer_annual,annual_buyer_churn_pct,gmv_net_retention_pct
+Y1,2027,322,2177,21.3,393,7768,1.2,0.466,0.594,0.128,16.7,13.2,230,46.0,74.7
+Y2,2028,179,3215,8.4,553,22239,3.1,0.513,0.641,0.128,18.3,14.8,318,46.0,74.7
+Y3,2029,138,2263,5.2,697,31363,5.1,0.518,0.645,0.128,18.5,15.0,399,46.0,74.7
+Y4,2030,430,7954,13.8,810,38153,1.9,0.512,0.639,0.128,18.5,15.0,465,46.0,74.7
+Y5,2031,670,12969,19.2,912,44406,1.4,0.508,0.635,0.128,18.5,15.0,524,46.0,74.7
+
+=== SCENARIO: BASE ===
+year,calendar,cac_buyer,cac_builder,payback_months,ltv_buyer,ltv_builder,ltv_cac_buyer_ratio,contribution_margin_per_run,rev_per_run,cogs_per_run,blended_take_pct,take_rate_only_pct,arpu_buyer_annual,annual_buyer_churn_pct,gmv_net_retention_pct
+Y1,2027,282,1699,12.6,665,11701,2.4,0.57,0.711,0.141,18.5,14.5,334,40.2,77.9
+Y2,2028,112,1831,3.7,909,34737,8.1,0.617,0.758,0.141,19.9,15.9,449,40.2,77.9
+Y3,2029,59,1335,1.7,1033,59027,17.5,0.621,0.761,0.141,20.0,16.0,510,40.2,77.9
+Y4,2030,141,3324,3.0,1428,87043,10.1,0.686,0.827,0.141,22.0,18.0,693,40.2,77.9
+Y5,2031,223,5587,4.0,1677,107007,7.5,0.682,0.823,0.141,22.0,18.0,814,40.2,77.9
+
+=== SCENARIO: AGGRESSIVE ===
+year,calendar,cac_buyer,cac_builder,payback_months,ltv_buyer,ltv_builder,ltv_cac_buyer_ratio,contribution_margin_per_run,rev_per_run,cogs_per_run,blended_take_pct,take_rate_only_pct,arpu_buyer_annual,annual_buyer_churn_pct,gmv_net_retention_pct
+Y1,2027,270,1484,8.8,1058,16948,3.9,0.699,0.846,0.147,21.1,16.6,446,34.8,80.9
+Y2,2028,128,1282,3.0,1462,37538,11.4,0.742,0.89,0.147,22.4,17.9,610,34.8,80.9
+Y3,2029,97,884,1.9,1710,45179,17.7,0.746,0.894,0.147,22.5,18.0,712,34.8,80.9
+Y4,2030,183,1991,2.6,2415,68833,13.2,0.816,0.963,0.147,24.5,20.0,992,34.8,80.9
+Y5,2031,234,2741,2.7,3018,91967,12.9,0.811,0.958,0.147,24.5,20.0,1241,34.8,80.9

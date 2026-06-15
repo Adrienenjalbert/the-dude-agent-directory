@@ -1,0 +1,26 @@
+"# scenarios.csv — conservative / base / aggressive side-by-side, headline metrics. USD. Estimates."
+# Series-A readiness = first year crossing ~$1-3M ARR (annual take+infra revenue).
+
+metric,conservative,base,aggressive
+Y3 GMV (2029),23843000,92926657,112695954
+Y3 take-rate revenue,3576450,14868265,20285272
+Y3 total revenue,4809051,19655763,26509706
+Y3 EBITDA,-3617689,5786912,8291219
+Y5 GMV (2031),54171296,301082368,531361421
+Y5 take-rate revenue,8125694,54194826,106272284
+Y5 total revenue,10753183,68847619,134004803
+Y5 EBITDA,-9775897,30423141,71647139
+Y5 gross margin %,79.9,82.9,84.6
+36mo cumulative cash needed (pre-raise trough),8240536,4061515,3919318
+"Implied raise (modeled, clean)",9000000,5000000,6500000
+Avg monthly burn (burning months),228904,162461,178151
+Series-A readiness (>=~$2M ARR take+infra),Y3 (2029),Y2 (2028),Y2 (2028)
+Runway: month cash goes negative (with raise),>36,>36,>36
+
+# RECONCILIATION TO RESEARCH SOM (market-research.md Table 13)
+SOM target: Y3 GMV,~$30M,~$90M,~$550M (Y5)
+SOM target: Y3 take revenue,~$4.5M,~$16M,~$110M (Y5)
+model: Y3 GMV,23843000,92926657,112695954
+model: Y3 take revenue,3576450,14868265,20285272
+model: Y5 GMV,54171296,301082368,531361421
+model: Y5 take revenue,8125694,54194826,106272284

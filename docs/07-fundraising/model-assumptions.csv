@@ -1,0 +1,46 @@
+# model-assumptions.csv — The Dude financial model key drivers (EDITABLE). All values are ESTIMATES unless tied to a cited doc.
+# Columns: low = conservative scenario, base = base scenario, high = aggressive scenario.
+# These are the exact drivers used by the bottoms-up engine (_build_model.py). Edit + re-run to reproduce CSVs.
+# Source tags: [research]=market-research.md, [bizplan]=business-plan.md, [apify]=apify-deep-dive.md, [est]=modeling assumption.
+category,driver,unit,low_conservative,base,high_aggressive,source,notes
+TIMELINE,model start,month,Jan-2027,Jan-2027,Jan-2027,[est],"Month 1 = Jan 2027; Y3=2029, Y5=2031 to match docs"
+TIMELINE,monthly horizon,months,36,36,36,[est],Y1-Y3 monthly; Y4-Y5 annual roll-up
+SUPPLY,founding builders seeded,builders,35,50,60,[bizplan],"Q1 milestone: recruit 25-50 founding builders from Apify rental-sunset pool"
+SUPPLY,builder count monthly growth,%/mo,8.5,10.0,11.5,[est],Compounding new-builder acquisition (SEO + outbound + community)
+SUPPLY,builder activation (publish >=1 paid agent),%,55,60,65,[est],Share of registered builders who publish a monetized agent
+SUPPLY,agents per active builder,agents,1.8,2.2,2.6,[apify],"Apify: ~40k devs / 24k+ Actors implies multi-agent prolific builders skew"
+DEMAND,active buyers by month 6 (turn-on floor),buyers,300,420,600,[est],Demand activated after supply seeding (public MVP ~Q3)
+DEMAND,initial buyer monthly growth (mo7),%/mo,23.0,25.0,23.5,[est],S-curve start; decays toward floor
+DEMAND,buyer growth monthly decay,pts/mo,0.25,0.30,0.35,[est],Growth rate decay (S-curve shaping)
+DEMAND,steady-state buyer growth floor,%/mo,10.5,11.8,10.5,[est],Asymptotic monthly active-buyer growth
+DEMAND,monthly buyer logo churn,%/mo,5.0,4.2,3.5,[est],"Higher early; SMB long-tail churn. Annualized ~35-46%"
+DEMAND,liquidity cap (buyers served per agent),buyers/agent,20,24,28,[est],Marketplace liquidity ceiling; rarely binds in base
+USAGE,paid runs per active buyer,runs/mo,78,100,110,[research],"Mid-market runs 144 agents/employee; SMB 59:1 - implies high run frequency"
+USAGE,avg GMV per paid run,USD,3.20,3.60,3.80,[research],"Blended outcome/usage price; HubSpot $0.50/resolution to Salesforce $2/conv; bundles higher"
+ECONOMICS,standard take rate (headline),% of GMV,15,16,18,[bizplan],"Take-rate strategy: ~10-15% standard, beating Apify 20%+/RapidAPI 25%"
+ECONOMICS,honeymoon drag (Y1 realized fraction of take),fraction,0.78,0.82,0.86,[bizplan],"0%-to-traction honeymoon: lower effective take early, ramps to full over 18mo"
+ECONOMICS,mature take rate (Y4-Y5),% of GMV,15,18,20,[research],"SOM uses 15-20% take; honeymoon fully rolled off by Y4"
+ECONOMICS,infra margin,% of GMV,3.5,4.0,4.5,[apify],"Metered compute/inference/tool-call/storage markup layered on top of take (Apify hidden margin engine)"
+ECONOMICS,subscription ARPU - builder,USD/mo,6,6,6,[apify],"Pro/Scale plan blended; Apify Starter $29 / Scale $199"
+ECONOMICS,subscription ARPU - buyer,USD/mo,4,4,4,[est],Buyer platform plan blended (free->pro)
+COGS,direct infra cost per run,USD/run,0.022,0.022,0.022,[est],"Compute + inference + sandbox per agent run (net of markup)"
+COGS,payment processing fee,% of GMV,2.9,2.9,2.9,[est],Stripe-style card+ACH blended on processed GMV
+COGS,payout handling / MoR fee,% of GMV,0.4,0.4,0.4,[est],Stripe Connect payouts + merchant-of-record tax handling
+MARGIN,target blended gross margin,%,~80,~83,~85,[apify],Emergent from COGS structure; software-marketplace-like
+HEADCOUNT,FTEs Y1,people,7,10,13,[apify],"Lean; Apify ran ~$25M ARR on ~160 FTE"
+HEADCOUNT,FTEs Y2,people,17,22,29,[est],
+HEADCOUNT,FTEs Y3,people,32,42,56,[est],
+HEADCOUNT,FTEs Y4,people,54,70,94,[est],
+HEADCOUNT,FTEs Y5,people,81,105,141,[est],
+HEADCOUNT,loaded cost per FTE,USD/yr,165000,165000,165000,[est],Blended fully-loaded (salary + benefits + overhead)
+HEADCOUNT,R&D share of headcount,%,50,50,50,[bizplan],Runtime/marketplace/console/SDK + eval/trust engineering
+HEADCOUNT,S&M share of headcount,%,32,32,32,[est],PLG + sales-assist + community
+HEADCOUNT,G&A share of headcount,%,18,18,18,[est],Trust&safety ops + compliance + finance + legal
+OPEX,S&M programs (non-payroll),% of GMV,~1.6,2.2,~3.0,[est],"Apollo outbound + content/SEO + community/Academy + paid + featured; floors apply early"
+OPEX,S&M programs floor Y1,USD,201600,280000,378000,[est],Floor when GMV-pct is below floor (scenario multipliers applied)
+OPEX,G&A non-payroll Y1->Y5,USD,220k->1.5M,220k->1.5M,220k->1.5M,[est],"Tooling, legal, EU AI Act compliance, finance"
+OPEX,R&D non-payroll Y1->Y5,USD,160k->1.2M,160k->1.2M,160k->1.2M,[est],"Infra/runtime tooling, eval/trust systems"
+GROWTH,Y4 annual GMV growth,%,60,100,130,[est],Y4 projected from Y3 (monthly engine ends M36)
+GROWTH,Y5 annual GMV growth,%,42,62,105,[est],Y5 projected from Y4
+FUNDING,implied raise (modeled clean),USD,9000000,5000000,6500000,[est],"Covers 36mo cumulative cash trough + ~6mo buffer; conservative needs most (no profit in-window)"
+FUNDING,Series A bar,ARR USD,1000000-3000000,1000000-3000000,1000000-3000000,[research],"Series A 2026 bar: $1-3M ARR + proven liquidity"
