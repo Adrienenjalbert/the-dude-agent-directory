@@ -2,10 +2,19 @@ import type { Metadata } from "next";
 import { Rocket, ShieldCheck, Wallet } from "lucide-react";
 import { PublishWizard } from "@/components/publish/publish-wizard";
 
+const DESCRIPTION =
+  "Package any agent with a declarative manifest, choose your pricing model, pass a sandbox test, and publish to the marketplace in minutes.";
+
 export const metadata: Metadata = {
   title: "Publish your agent",
-  description:
-    "Package any agent with a declarative manifest, choose your pricing model, pass a sandbox test, and publish to the marketplace in minutes.",
+  description: DESCRIPTION,
+  alternates: { canonical: "/publish" },
+  openGraph: {
+    title: "Publish your agent · The Dude",
+    description: DESCRIPTION,
+    url: "/publish",
+    type: "website",
+  },
 };
 
 const HIGHLIGHTS = [

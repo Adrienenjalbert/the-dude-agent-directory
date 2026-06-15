@@ -84,6 +84,7 @@ export const AGENTS: Agent[] = [
       },
     ],
     gradient: "from-[#E8703A] to-[#D9A441]",
+    payoutShare: 0.85,
   },
   {
     slug: "triage-desk",
@@ -149,6 +150,7 @@ export const AGENTS: Agent[] = [
       },
     ],
     gradient: "from-[#4F8A5B] to-[#E8703A]",
+    payoutShare: 0.85,
   },
   {
     slug: "deep-scout",
@@ -214,6 +216,7 @@ export const AGENTS: Agent[] = [
       },
     ],
     gradient: "from-[#3B6FB0] to-[#4F8A5B]",
+    payoutShare: 0.85,
   },
   {
     slug: "patch-pilot",
@@ -278,6 +281,7 @@ export const AGENTS: Agent[] = [
       },
     ],
     gradient: "from-[#211C18] to-[#E8703A]",
+    payoutShare: 0.85,
   },
   {
     slug: "harvest-etl",
@@ -334,6 +338,7 @@ export const AGENTS: Agent[] = [
       },
     ],
     gradient: "from-[#3B6FB0] to-[#211C18]",
+    payoutShare: 0.85,
   },
   {
     slug: "copy-forge",
@@ -390,6 +395,7 @@ export const AGENTS: Agent[] = [
       },
     ],
     gradient: "from-[#E8703A] to-[#C2552F]",
+    payoutShare: 0.85,
   },
   {
     slug: "flowwright-ops",
@@ -445,6 +451,7 @@ export const AGENTS: Agent[] = [
       },
     ],
     gradient: "from-[#4F8A5B] to-[#3B6FB0]",
+    payoutShare: 0.85,
   },
   {
     slug: "ledger-lens",
@@ -502,6 +509,7 @@ export const AGENTS: Agent[] = [
       },
     ],
     gradient: "from-[#211C18] to-[#4F8A5B]",
+    payoutShare: 0.85,
   },
   {
     slug: "signal-prospector",
@@ -556,6 +564,7 @@ export const AGENTS: Agent[] = [
       },
     ],
     gradient: "from-[#D9A441] to-[#E8703A]",
+    payoutShare: 0.85,
   },
   {
     slug: "insight-pulse",
@@ -611,6 +620,7 @@ export const AGENTS: Agent[] = [
       },
     ],
     gradient: "from-[#3B6FB0] to-[#D9A441]",
+    payoutShare: 0.85,
   },
   {
     slug: "migrate-mate",
@@ -666,6 +676,7 @@ export const AGENTS: Agent[] = [
       },
     ],
     gradient: "from-[#E8703A] to-[#3B6FB0]",
+    payoutShare: 0.85,
   },
   {
     slug: "seo-cartographer",
@@ -720,6 +731,7 @@ export const AGENTS: Agent[] = [
       },
     ],
     gradient: "from-[#4F8A5B] to-[#D9A441]",
+    payoutShare: 0.85,
   },
   {
     slug: "onboard-orchestra",
@@ -776,6 +788,7 @@ export const AGENTS: Agent[] = [
       },
     ],
     gradient: "from-[#D9A441] to-[#4F8A5B]",
+    payoutShare: 0.85,
   },
   {
     slug: "invoice-sentry",
@@ -830,6 +843,7 @@ export const AGENTS: Agent[] = [
       },
     ],
     gradient: "from-[#3B6FB0] to-[#E8703A]",
+    payoutShare: 0.85,
   },
 ];
 

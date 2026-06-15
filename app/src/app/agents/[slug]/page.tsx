@@ -19,6 +19,8 @@ import { Rating } from "@/components/ui/rating";
 import { CategoryIcon } from "@/components/category-icon";
 import { AgentCard } from "@/components/agent-card";
 import { RunPanel } from "@/components/agent/run-panel";
+import { absoluteUrl, SITE_NAME, OG_IMAGE_URL } from "@/lib/site";
+import type { Agent } from "@/data/types";
 import { cn, formatNumber } from "@/lib/utils";
 
 type DetailParams = Promise<{ slug: string }>;
@@ -37,11 +39,66 @@ export async function generateMetadata({
   const { slug } = await params;
   const agent = getAgentBySlug(slug);
   if (!agent) return { title: "Agent not found" };
+  const path = `/agents/${agent.slug}`;
+  const title = `${agent.name} — ${agent.tagline}`;
   return {
-    title: `${agent.name} — ${agent.tagline}`,
+    title,
     description: agent.summary,
-    openGraph: { title: agent.name, description: agent.summary },
+    keywords: [
+      agent.name,
+      agent.category,
+      agent.framework,
+      ...agent.integrations,
+      "AI agent",
+    ],
+    alternates: { canonical: path },
+    openGraph: {
+      title: `${title} · ${SITE_NAME}`,
+      description: agent.summary,
+      url: path,
+      type: "website",
+      images: [{ url: OG_IMAGE_URL, width: 1200, height: 630, alt: agent.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} · ${SITE_NAME}`,
+      description: agent.summary,
+      images: [OG_IMAGE_URL],
+    },
   };
+}
+
+/**
+ * JSON-LD structured data: model the agent as a SoftwareApplication with an
+ * aggregateRating and an offer, powering rich results for the PLG-SEO strategy.
+ */
+function buildJsonLd(agent: Agent): string {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: agent.name,
+    description: agent.summary,
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Cloud",
+    url: absoluteUrl(`/agents/${agent.slug}`),
+    image: OG_IMAGE_URL,
+    author: { "@type": "Organization", name: agent.author },
+    offers: {
+      "@type": "Offer",
+      price: agent.pricing.amount,
+      priceCurrency: "USD",
+      description: `${agent.pricing.display} — ${agent.pricing.unit}`,
+      availability: "https://schema.org/InStock",
+    },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: agent.metrics.rating,
+      reviewCount: agent.metrics.reviewCount,
+      bestRating: 5,
+      worstRating: 1,
+    },
+  };
+  return JSON.stringify(data);
 }
 
 export default async function AgentDetailPage({
@@ -59,6 +116,10 @@ export default async function AgentDetailPage({
 
   return (
     <div className="container-page py-10 sm:py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: buildJsonLd(agent) }}
+      />
       <Link
         href="/agents"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"

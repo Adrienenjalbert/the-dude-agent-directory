@@ -1,10 +1,19 @@
 import type { Metadata } from "next";
 import { BrowseWithParams } from "@/components/browse/browse-with-params";
 
+const DESCRIPTION =
+  "Search the directory of verified AI agents across sales, support, research, coding, data, marketing, ops, and finance — with transparent pricing and measured performance.";
+
 export const metadata: Metadata = {
   title: "Browse agents",
-  description:
-    "Search the directory of verified AI agents across sales, support, research, coding, data, marketing, ops, and finance — with transparent pricing and measured performance.",
+  description: DESCRIPTION,
+  alternates: { canonical: "/agents" },
+  openGraph: {
+    title: "Browse verified AI agents · The Dude",
+    description: DESCRIPTION,
+    url: "/agents",
+    type: "website",
+  },
 };
 
 export default function AgentsPage() {

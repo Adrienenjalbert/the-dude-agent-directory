@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   LayoutDashboard,
   Wallet,
@@ -12,20 +12,28 @@ import {
   Bot,
   ShoppingBag,
   ArrowUpRight,
+  ArrowDownRight,
   CheckCircle2,
   Loader2,
   XCircle,
+  ChevronUp,
+  ChevronDown,
+  ChevronsUpDown,
   type LucideIcon,
 } from "lucide-react";
 import { TrendChart } from "@/components/console/trend-chart";
 import {
-  BUILDER_KPIS,
-  BUILDER_EARNINGS,
+  TIME_RANGES,
+  builderData,
+  buyerData,
   BUILDER_AGENTS,
-  BUYER_KPIS,
-  BUYER_SPEND,
   BUYER_RENTALS,
   BUYER_RUNS,
+  type TimeRange,
+  type Kpi,
+  type BuilderAgentRow,
+  type BuyerRunRow,
+  type RentalRow,
 } from "@/data/console";
 import { cn, formatNumber } from "@/lib/utils";
 
@@ -41,6 +49,7 @@ const usd = (n: number) =>
 
 export function ConsoleDashboard() {
   const [view, setView] = useState<View>("builder");
+  const [range, setRange] = useState<TimeRange>("6m");
 
   const NAV: { label: string; icon: LucideIcon; active?: boolean }[] =
     view === "builder"
@@ -119,8 +128,59 @@ export function ConsoleDashboard() {
 
       {/* Main */}
       <div className="flex flex-col gap-6">
-        {view === "builder" ? <BuilderView /> : <BuyerView />}
+        {/* Header + time-range selector */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <Header
+            title={view === "builder" ? "Builder console" : "Buyer console"}
+            subtitle={
+              view === "builder"
+                ? "Your earnings, runs, and agent performance at a glance."
+                : "Your spend, active rentals, and recent runs."
+            }
+          />
+          <RangePicker range={range} onChange={setRange} />
+        </div>
+
+        {view === "builder" ? (
+          <BuilderView range={range} />
+        ) : (
+          <BuyerView range={range} />
+        )}
       </div>
+    </div>
+  );
+}
+
+function RangePicker({
+  range,
+  onChange,
+}: {
+  range: TimeRange;
+  onChange: (r: TimeRange) => void;
+}) {
+  return (
+    <div
+      role="radiogroup"
+      aria-label="Time range"
+      className="flex shrink-0 gap-1 rounded-pill bg-background-alt p-1"
+    >
+      {TIME_RANGES.map((r) => (
+        <button
+          key={r.key}
+          type="button"
+          role="radio"
+          aria-checked={range === r.key}
+          onClick={() => onChange(r.key)}
+          className={cn(
+            "rounded-pill px-3 py-1.5 text-xs font-semibold transition-colors",
+            range === r.key
+              ? "bg-card text-foreground shadow-soft"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          {r.label}
+        </button>
+      ))}
     </div>
   );
 }
@@ -157,36 +217,68 @@ function ToggleButton({
 
 /* ----------------------------- Builder view ---------------------------- */
 
-function BuilderView() {
+function BuilderView({ range }: { range: TimeRange }) {
+  const data = useMemo(() => builderData(range), [range]);
   return (
     <>
-      <Header
-        title="Builder console"
-        subtitle="Your earnings, runs, and agent performance at a glance."
-      />
-
-      <KpiGrid kpis={BUILDER_KPIS} />
+      <KpiGrid kpis={data.kpis} />
 
       <Card>
-        <CardHeader title="Earnings & runs" subtitle="Last 6 months" />
-        <TrendChart data={BUILDER_EARNINGS} formatValue={usd} label="Earnings" />
+        <CardHeader title="Earnings & runs" subtitle={data.trendSubtitle} />
+        <TrendChart data={data.trend} formatValue={usd} label="Earnings" />
       </Card>
 
       <Card>
         <CardHeader title="Top agents" subtitle="By revenue (30 days)" />
-        <Table
-          head={["Agent", "Runs", "Success", "Revenue", ""]}
-          rows={BUILDER_AGENTS.map((a) => [
-            <span key="n" className="font-medium text-foreground">
-              {a.name}
-            </span>,
-            formatNumber(a.runs),
-            <SuccessPill key="s" value={a.successRate} />,
-            <span key="r" className="font-semibold text-foreground">
-              {usd(a.revenue)}
-            </span>,
-            <TrendIcon key="t" trend={a.trend} />,
-          ])}
+        <SortableTable<BuilderAgentRow>
+          rows={BUILDER_AGENTS}
+          initialSort="revenue"
+          columns={[
+            {
+              key: "name",
+              header: "Agent",
+              sortable: true,
+              accessor: (a) => a.name,
+              cell: (a) => (
+                <span className="font-medium text-foreground">{a.name}</span>
+              ),
+            },
+            {
+              key: "runs",
+              header: "Runs",
+              sortable: true,
+              numeric: true,
+              accessor: (a) => a.runs,
+              cell: (a) => formatNumber(a.runs),
+            },
+            {
+              key: "successRate",
+              header: "Success",
+              sortable: true,
+              numeric: true,
+              accessor: (a) => a.successRate,
+              cell: (a) => <SuccessPill value={a.successRate} />,
+            },
+            {
+              key: "revenue",
+              header: "Revenue",
+              sortable: true,
+              numeric: true,
+              accessor: (a) => a.revenue,
+              cell: (a) => (
+                <span className="font-semibold text-foreground">
+                  {usd(a.revenue)}
+                </span>
+              ),
+            },
+            {
+              key: "trend",
+              header: "",
+              sortable: false,
+              accessor: (a) => a.trend,
+              cell: (a) => <TrendIcon trend={a.trend} />,
+            },
+          ]}
         />
       </Card>
     </>
@@ -195,66 +287,117 @@ function BuilderView() {
 
 /* ------------------------------ Buyer view ----------------------------- */
 
-function BuyerView() {
+function BuyerView({ range }: { range: TimeRange }) {
+  const data = useMemo(() => buyerData(range), [range]);
   return (
     <>
-      <Header
-        title="Buyer console"
-        subtitle="Your spend, active rentals, and recent runs."
-      />
-
-      <KpiGrid kpis={BUYER_KPIS} />
+      <KpiGrid kpis={data.kpis} />
 
       <Card>
-        <CardHeader title="Spend & runs" subtitle="Last 6 months" />
-        <TrendChart data={BUYER_SPEND} formatValue={usd} label="Spend" />
+        <CardHeader title="Spend & runs" subtitle={data.trendSubtitle} />
+        <TrendChart data={data.trend} formatValue={usd} label="Spend" />
       </Card>
 
       <div className="grid gap-6 xl:grid-cols-2">
         <Card>
           <CardHeader title="Active rentals" subtitle="7 agents in use" />
-          <Table
-            head={["Agent", "Model", "Spend", "Next bill"]}
-            rows={BUYER_RENTALS.map((r) => [
-              <span key="a" className="font-medium text-foreground">
-                {r.agent}
-              </span>,
-              <span key="m" className="text-muted-foreground">
-                {r.model}
-              </span>,
-              <span key="s" className="font-semibold text-foreground">
-                {usd(r.spendThisMonth)}
-              </span>,
-              <span key="n" className="text-muted-foreground">
-                {r.nextBill}
-              </span>,
-            ])}
+          <SortableTable<RentalRow>
+            rows={BUYER_RENTALS}
+            initialSort="spendThisMonth"
+            columns={[
+              {
+                key: "agent",
+                header: "Agent",
+                sortable: true,
+                accessor: (r) => r.agent,
+                cell: (r) => (
+                  <span className="font-medium text-foreground">{r.agent}</span>
+                ),
+              },
+              {
+                key: "model",
+                header: "Model",
+                sortable: true,
+                accessor: (r) => r.model,
+                cell: (r) => (
+                  <span className="text-muted-foreground">{r.model}</span>
+                ),
+              },
+              {
+                key: "spendThisMonth",
+                header: "Spend",
+                sortable: true,
+                numeric: true,
+                accessor: (r) => r.spendThisMonth,
+                cell: (r) => (
+                  <span className="font-semibold text-foreground">
+                    {usd(r.spendThisMonth)}
+                  </span>
+                ),
+              },
+              {
+                key: "nextBill",
+                header: "Next bill",
+                sortable: false,
+                accessor: (r) => r.nextBill,
+                cell: (r) => (
+                  <span className="text-muted-foreground">{r.nextBill}</span>
+                ),
+              },
+            ]}
           />
         </Card>
 
         <Card>
           <CardHeader title="Recent runs" subtitle="Live activity" />
-          <ul className="flex flex-col divide-y divide-border">
-            {BUYER_RUNS.map((run, i) => (
-              <li key={i} className="flex items-center gap-3 py-3">
-                <RunStatus status={run.status} />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-foreground">
-                    {run.agent}
-                  </p>
-                  <p className="truncate text-xs text-muted-foreground">
-                    {run.outcome}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-foreground">
-                    {run.cost === 0 ? "—" : usd(run.cost)}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{run.date}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <SortableTable<BuyerRunRow>
+            rows={BUYER_RUNS}
+            initialSort="agoMinutes"
+            initialDir="asc"
+            columns={[
+              {
+                key: "agent",
+                header: "Agent",
+                sortable: true,
+                accessor: (r) => r.agent,
+                cell: (r) => (
+                  <span className="flex items-center gap-2">
+                    <RunStatus status={r.status} />
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-medium text-foreground">
+                        {r.agent}
+                      </span>
+                      <span className="block truncate text-xs text-muted-foreground">
+                        {r.outcome}
+                      </span>
+                    </span>
+                  </span>
+                ),
+              },
+              {
+                key: "cost",
+                header: "Cost",
+                sortable: true,
+                numeric: true,
+                accessor: (r) => r.cost,
+                cell: (r) => (
+                  <span className="font-semibold text-foreground">
+                    {r.cost === 0 ? "—" : usd(r.cost)}
+                  </span>
+                ),
+              },
+              {
+                key: "agoMinutes",
+                header: "When",
+                sortable: true,
+                numeric: true,
+                accessor: (r) => r.agoMinutes,
+                cell: (r) => (
+                  <span className="text-xs text-muted-foreground">{r.date}</span>
+                ),
+              },
+            ]}
+          />
         </Card>
       </div>
     </>
@@ -272,11 +415,7 @@ function Header({ title, subtitle }: { title: string; subtitle: string }) {
   );
 }
 
-function KpiGrid({
-  kpis,
-}: {
-  kpis: { label: string; value: string; delta: string; positive: boolean }[];
-}) {
+function KpiGrid({ kpis }: { kpis: Kpi[] }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {kpis.map((kpi) => (
@@ -294,7 +433,11 @@ function KpiGrid({
               kpi.positive ? "text-success" : "text-danger",
             )}
           >
-            <ArrowUpRight className="size-3.5" aria-hidden />
+            {kpi.positive ? (
+              <ArrowUpRight className="size-3.5" aria-hidden />
+            ) : (
+              <ArrowDownRight className="size-3.5" aria-hidden />
+            )}
             {kpi.delta}
           </span>
         </div>
@@ -320,37 +463,118 @@ function CardHeader({ title, subtitle }: { title: string; subtitle: string }) {
   );
 }
 
-function Table({
-  head,
+/* --------------------------- Sortable table ---------------------------- */
+
+type SortDir = "asc" | "desc";
+
+interface Column<T> {
+  key: string;
+  header: string;
+  sortable: boolean;
+  /** Right-align + numeric comparison. */
+  numeric?: boolean;
+  accessor: (row: T) => string | number;
+  cell: (row: T) => React.ReactNode;
+}
+
+function SortableTable<T>({
   rows,
+  columns,
+  initialSort,
+  initialDir = "desc",
 }: {
-  head: string[];
-  rows: React.ReactNode[][];
+  rows: T[];
+  columns: Column<T>[];
+  initialSort: string;
+  initialDir?: SortDir;
 }) {
+  const [sortKey, setSortKey] = useState(initialSort);
+  const [dir, setDir] = useState<SortDir>(initialDir);
+
+  const sorted = useMemo(() => {
+    const col = columns.find((c) => c.key === sortKey);
+    if (!col) return rows;
+    const copy = [...rows];
+    copy.sort((a, b) => {
+      const av = col.accessor(a);
+      const bv = col.accessor(b);
+      let cmp: number;
+      if (typeof av === "number" && typeof bv === "number") cmp = av - bv;
+      else cmp = String(av).localeCompare(String(bv));
+      return dir === "asc" ? cmp : -cmp;
+    });
+    return copy;
+  }, [rows, columns, sortKey, dir]);
+
+  const toggle = (key: string) => {
+    if (key === sortKey) {
+      setDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setDir("desc");
+    }
+  };
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="border-b border-border text-left">
-            {head.map((h, i) => (
-              <th
-                key={i}
-                className="px-2 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
-              >
-                {h}
-              </th>
-            ))}
+            {columns.map((col) => {
+              const isActive = col.key === sortKey;
+              return (
+                <th
+                  key={col.key}
+                  aria-sort={
+                    !col.sortable
+                      ? undefined
+                      : isActive
+                        ? dir === "asc"
+                          ? "ascending"
+                          : "descending"
+                        : "none"
+                  }
+                  className={cn(
+                    "px-2 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground",
+                    col.numeric && "text-right",
+                  )}
+                >
+                  {col.sortable && col.header ? (
+                    <button
+                      type="button"
+                      onClick={() => toggle(col.key)}
+                      className={cn(
+                        "inline-flex items-center gap-1 transition-colors hover:text-foreground",
+                        col.numeric && "flex-row-reverse",
+                        isActive && "text-foreground",
+                      )}
+                    >
+                      {col.header}
+                      <SortGlyph active={isActive} dir={dir} />
+                    </button>
+                  ) : (
+                    col.header
+                  )}
+                </th>
+              );
+            })}
           </tr>
         </thead>
         <tbody>
-          {rows.map((row, i) => (
+          {sorted.map((row, i) => (
             <tr
               key={i}
               className="border-b border-border/60 last:border-0 hover:bg-background-alt/50"
             >
-              {row.map((cell, j) => (
-                <td key={j} className="px-2 py-3 align-middle">
-                  {cell}
+              {columns.map((col) => (
+                <td
+                  key={col.key}
+                  className={cn(
+                    "px-2 py-3 align-middle",
+                    col.numeric && "text-right",
+                  )}
+                >
+                  {col.cell(row)}
                 </td>
               ))}
             </tr>
@@ -358,6 +582,16 @@ function Table({
         </tbody>
       </table>
     </div>
+  );
+}
+
+function SortGlyph({ active, dir }: { active: boolean; dir: SortDir }) {
+  if (!active)
+    return <ChevronsUpDown className="size-3 text-muted-foreground/60" aria-hidden />;
+  return dir === "asc" ? (
+    <ChevronUp className="size-3" aria-hidden />
+  ) : (
+    <ChevronDown className="size-3" aria-hidden />
   );
 }
 
